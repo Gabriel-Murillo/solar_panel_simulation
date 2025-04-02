@@ -8,9 +8,16 @@ def normalize_vector(vector):
         return vector / norm
     return vector
 
-def convert_vectors(x, y, z):
-    """Convert object with type np.array from numpy to object with type vector from vpython."""
+def array_to_vector(x, y, z):
+    """Convert np.array from numpy to vector from vpython."""
     vec_x = x
     vec_y = z
     vec_z = -y
     return vector(vec_x, vec_y, vec_z)
+
+def vector_to_array(x, y , z):
+    """Convert vector from vpython to np.array from numpy."""
+    vec_x = x
+    vec_y = -z
+    vec_z = y
+    return np.array([vec_x, vec_y, vec_z])

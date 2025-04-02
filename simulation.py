@@ -27,12 +27,18 @@ class Simulation:
     def get_angle_degrees(self):
         return np.degrees(self.get_angle_radians())
 
-    def graph(self):
+    def graph_vector_representation(self):
         view = Graph3D()
-        sun = sphere(pos=(view.unit_vectors[2] * 4.5), radius=0.2, color=color.yellow)
 
-        sun_vector = convert_vectors(*self.sunlight.direction)
+        sun = sphere(pos=(view.unit_vectors[2] * 4.5), radius=0.2, color=color.yellow)
+        sun_vector = array_to_vector(*self.sunlight.direction) # convert to usable format
         sun_arrow = arrow(pos=sun.pos, axis=sun_vector, color=color.yellow)
+
+        label(pos=(sun.pos + sun_vector) * 1.1, text=', '.join(f"{x:.2f}" for x in self.sunlight.direction), color=color.yellow, box=False)
+
+        solar_panel_surface_normal_vector = array_to_vector(*self.solar_panel.surface_normal)
+        solar_panel_surface_normal_arrow = arrow(pos=view.origin, axis=solar_panel_surface_normal_vector, color=color.white)
+        label(pos=(view.origin + solar_panel_surface_normal_vector) * 1.1, text=', '.join(f"{x:.2f}" for x in self.solar_panel.surface_normal), color=color.white, box=False)
 
         while True:
             rate(60)  # Keeps the scene running
@@ -51,12 +57,19 @@ if __name__ == '__main__':
 
     # Create simulation
     sim1 = Simulation(sunray_down, square_panel)
+    sim2 = Simulation(sunray_bottom_right, rectangle_panel)
+
     square_panel.print()
 
     print(f"Angle in radians: {sim1.get_angle_radians():.2f}")
     print(f"Angle in degrees: {sim1.get_angle_degrees():.2f}°")
     print(f"Total Electricity: {sim1.get_electricity():.2f} W")
 
-    sim1.graph()
+    print()
 
+    print(f"Angle in radians: {sim2.get_angle_radians():.2f}")
+    print(f"Angle in degrees: {sim2.get_angle_degrees():.2f}°")
+    print(f"Total Electricity: {sim2.get_electricity():.2f} W")
 
+    #sim1.graph_vector_representation()
+    sim2.graph_vector_representation()
