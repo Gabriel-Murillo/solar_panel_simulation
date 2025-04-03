@@ -1,37 +1,50 @@
 from vpython import *
 
 class Graph3D:
-    def __init__(self, width=800, height=600):
+    def __init__(self, width, height):
+        # Define vector at origin
         self.origin = vector(0,0,0)
 
-        # Set the scene
+        # Set the main scene
         scene.width = width
         scene.height = height
         scene.background = color.black
-        scene.userzoom = False
-
         scene.center = self.origin # center the view
         scene.range = 6 # Zoom level (smaller = more zoom)
 
-        # Define unit vectors
-        i = arrow(pos=self.origin, axis=vector(1, 0, 0), color=color.red)
-        j = arrow(pos=self.origin, axis=vector(0, 0, -1), color=color.blue)
-        k = arrow(pos=self.origin, axis=vector(0, 1, 0), color=color.green)
-        self.unit_vectors = [i.axis, j.axis, k.axis]
+        # Create separate canvas for coordinates
+        self.overlay = canvas(width = 200, height = 200, background=color.black)
+        #self.overlay.visible = True
+        #self.overlay.align = 'left'
+
+        #self.overlay.append_to_caption('\n') # Adds space between main scene and overlay
+
+        # Define unit vectors, assign them to overlay
+        self.unit_vectors = [vector(1, 0, 0), vector(0, 0, -1), vector(0, 1, 0)]
+
+        u = self.unit_vectors # keep names simple
+        c = 3 # constant
+        i = arrow(canvas=self.overlay, pos=self.origin, axis=c*u[0], color=color.red)
+        j = arrow(canvas=self.overlay,pos=self.origin, axis=c*u[1], color=color.blue)
+        k = arrow(canvas=self.overlay,pos=self.origin, axis=c*u[2], color=color.green)
 
         # Label unit vectors
-        label(pos=i.axis * 1.1, text='X', color=color.red, box=False)
-        label(pos=j.axis * 1.1, text='Y', color=color.blue, box=False)
-        label(pos=k.axis * 1.1, text='Z', color=color.green, box=False)
+        label(canvas=self.overlay,pos=i.axis, text='X', color=color.red, box=False)
+        label(canvas=self.overlay,pos=j.axis, text='Y', color=color.blue, box=False)
+        label(canvas=self.overlay,pos=k.axis, text='Z', color=color.green, box=False)
 
-        # Get isometric view:
-        self._isometric_view()
+        # Initialize syncing, continue syncing in main loop (simulation.py)
+        self.overlay.camera.pos = scene.camera.pos
+        self.overlay.camera.axis = scene.camera.axis
+        self.overlay.camera.up = scene.camera.up
+
+
 
     def _isometric_view(self):
         """Get an isometric view."""
         # 1. Rotate around X by -45 degrees
         scene.camera.rotate(angle=radians(-45), axis=self.unit_vectors[0], origin=self.origin)
-        scene.center = vector(0, 0, 0)  # center of view
+        #scene.center = self.origin  # center of view
         # 2. Rotate around Z by 45 degrees
         scene.camera.rotate(angle=radians(45), axis=self.unit_vectors[2], origin=self.origin)
         scene.center = vector(0, 0, 0)  # center of view
@@ -40,9 +53,13 @@ class Graph3D:
         """Undo the isometric view."""
         # 2. Rotate around Z by -45 degrees
         scene.camera.rotate(angle=radians(-45), axis=self.unit_vectors[2], origin=self.origin)
-        scene.center = vector(0, 0, 0)  # center the view
+        scene.center = self.origin  # center the view
         # 1. Rotate around X by 45 degrees
         scene.camera.rotate(angle=radians(45), axis=self.unit_vectors[0], origin=self.origin)
         scene.center = vector(0, 0, 0)  # center the view
 
+    def _reset_view(self):
+        scene.forward = vector(0, 0, -1)  # Camera direction
+        scene.up = vector(0, 1, 0)  # Up direction
+        scene.center = vector(0, 0, 0)  # Center of the view
 
