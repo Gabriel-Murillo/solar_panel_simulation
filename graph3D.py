@@ -58,7 +58,7 @@ class Graph3D:
         scene.camera.rotate(angle=radians(45), axis=self.unit_vectors[0], origin=self.origin)
         scene.center = vector(0, 0, 0)  # center the view
 
-    def _reset_view(self):
+    def reset_view(self):
         scene.forward = vector(0, 0, -1)  # Camera direction
         scene.up = vector(0, 1, 0)  # Up direction
         scene.center = vector(0, 0, 0)  # Center of the view
