@@ -13,9 +13,9 @@ class Graph3D:
         scene.range = 6 # Zoom level (smaller = more zoom)
 
         # Create separate canvas for coordinates
-        self.overlay = canvas(width = 200, height = 200, background=color.black)
+        self.overlay = canvas(width = width*0.25, height = 250, background=color.black)
         #self.overlay.visible = True
-        #self.overlay.align = 'left'
+        self.overlay.align = 'right'
 
         #self.overlay.append_to_caption('\n') # Adds space between main scene and overlay
 
@@ -23,15 +23,17 @@ class Graph3D:
         self.unit_vectors = [vector(1, 0, 0), vector(0, 0, -1), vector(0, 1, 0)]
 
         u = self.unit_vectors # keep names simple
-        c = 3 # constant
+        c = 3.5 # constant
         i = arrow(canvas=self.overlay, pos=self.origin, axis=c*u[0], color=color.red)
         j = arrow(canvas=self.overlay,pos=self.origin, axis=c*u[1], color=color.blue)
         k = arrow(canvas=self.overlay,pos=self.origin, axis=c*u[2], color=color.green)
 
         # Label unit vectors
-        label(canvas=self.overlay,pos=i.axis, text='X', color=color.red, box=False)
-        label(canvas=self.overlay,pos=j.axis, text='Y', color=color.blue, box=False)
-        label(canvas=self.overlay,pos=k.axis, text='Z', color=color.green, box=False)
+        unit_const=1.2
+        unit_font_size = 25
+        label(canvas=self.overlay,pos=i.axis*unit_const, text='X', color=color.red, box=False, height = unit_font_size)
+        label(canvas=self.overlay,pos=j.axis*unit_const, text='Y', color=color.blue, box=False, height = unit_font_size)
+        label(canvas=self.overlay,pos=k.axis*unit_const, text='Z', color=color.green, box=False, height = unit_font_size)
 
         # Initialize syncing, continue syncing in main loop (simulation.py)
         self.overlay.camera.pos = scene.camera.pos
