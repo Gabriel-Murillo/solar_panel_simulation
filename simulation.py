@@ -7,7 +7,6 @@ from sunlight import Sunlight
 from solar_panels import *
 from graph3D import *
 
-
 running = True
 def end_sim():
     global running
@@ -22,6 +21,7 @@ class Simulation:
         self.sunlight = sunlight # sunlight vector
         # Convert np.array containing direction of sunlight to vector usable in vpython
         self.sun_vector = array_to_vector(*self.sunlight.direction)
+        self.sun_pos_radius = 5
 
         self.solar_panel = solar_panel # solar panel vector
         # Direction that the solar panel is facing in vector form
@@ -53,9 +53,9 @@ class Simulation:
         self.orig_xyz = vector(self.solar_panel_surface_normal_vector.x,self.solar_panel_surface_normal_vector.y,self.solar_panel_surface_normal_vector.z)
 
         '''Draw the sun'''
-        #TODO sun is coded to be above in this scene, need way to customize it. Idea: position of sun based on vector, use moon model if light intensity goes below certain value
-        sun_height = 4.5 # scale
-        sun = sphere(canvas=scene, pos=(self.model.unit_vectors[2] * sun_height), radius=0.2, color=color.yellow, emmissive=True)
+        #TODO sun is coded to be above in this scene, need way to customize it. use moon model if light intensity goes below certain value
+        sun_pos = self.get_sun_pos()
+        sun = sphere(canvas=scene, pos=sun_pos, radius=0.2, color=color.yellow, emmissive=True)
         sun2 = sphere(canvas=scene, pos=sun.pos, radius=0.3, color=color.yellow,emmissive=True, opacity=0.6)
         sun3 = sphere(canvas=scene, pos=sun.pos, radius=0.5, color=color.yellow,emmissive=True, opacity=0.2)
 
@@ -222,6 +222,38 @@ class Simulation:
         """Update solar panel surface normal z component """
         self.update_solar_panel_normal(2, z)
 
+    def get_sun_pos(self):
+        """Convert unit vector to position on sphere for sun position coordinates."""
+        direction = self.sunlight.direction # get normalized vector direction
+        radius = self.sun_pos_radius
+        pos = vector(0,0,0)
+        sun_pos = vector(0,0,0)
+
+        # TODO change coordinate cube to sphere
+        # Get coordinates on a cube
+        if abs(direction[0]) > 0:
+            pos.x = -sign(direction[0])*radius
+        if abs(direction[1]) > 0:
+            pos.z = sign(direction[1])*radius
+        if abs(direction[2]) > 0:
+            pos.y = -sign(direction[2])*radius
+
+        pos_norm = np.sqrt(pos.x**2 + pos.y**2 + pos.z**2)
+        pos.x = pos.x/pos_norm
+        pos.y = pos.y/pos_norm
+        pos.z = pos.z/pos_norm
+
+        # Get angle phi and theta of pos vector
+        theta = np.arccos(pos.z / radius)
+        phi = np.arctan2(pos.y, pos.x)
+
+        # Get coordinates on sphere
+        sun_pos.x = radius * sin(theta) * cos(phi)
+        sun_pos.y = radius * sin(theta) * sin(phi)
+        sun_pos.z = radius * cos(theta)
+
+        return sun_pos
+
 def run_test(experiment):
     # Create sunray objects
     sunray_0 = Sunlight() # New moon
@@ -232,7 +264,7 @@ def run_test(experiment):
 
     match experiment:
         case 1:
-            square_panel = SolarPanelRectangle(10, 10, 0.5, np.array([0, 1, 1]))
+            square_panel = SolarPanelRectangle(10, 10, 0.5, np.array([0, 0, 1]))
             sim = Simulation(sunray_down, square_panel) # Create simulation
 
             print(f"Angle in radians: {sim.get_angle_radians():.2f}")
@@ -267,6 +299,12 @@ def run_test(experiment):
             sim = Simulation(sunray_down, square_panel)  # Create simulation
 
             sim.graph_vector_representation()
+        case 7:
+            sunray = Sunlight(10, np.array([1, 1, 1]))  # unphysical
+            square_panel = SolarPanelRectangle(10, 10, 0.5, np.array([0, 0, 1]))
+            sim = Simulation(sunray, square_panel)  # Create simulation
+
+            sim.graph_vector_representation()
 
 if __name__ == '__main__':
-    run_test(5)
+    run_test(4)
