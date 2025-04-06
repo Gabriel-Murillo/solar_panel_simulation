@@ -8,14 +8,16 @@ class Graph3D:
         # Set the main scene
         scene.width = width
         scene.height = height
-        scene.background = color.black
+        scene.background = color.gray(0.25)
         scene.center = self.origin # center the view
         scene.range = 6 # Zoom level (smaller = more zoom)
+        scene.resizable = False
 
         # Create separate canvas for coordinates
         self.overlay = canvas(width = width*0.25, height = 250, background=color.black)
         #self.overlay.visible = True
         self.overlay.align = 'right'
+        self.overlay.resizable = False
 
         #self.overlay.append_to_caption('\n') # Adds space between main scene and overlay
 

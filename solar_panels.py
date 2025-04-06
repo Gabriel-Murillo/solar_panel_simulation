@@ -13,7 +13,7 @@ class SolarPanel:
         print(f"Name: {self.name}, Area: {self.area} m², Surface Normal: ({', '.join(map(str, self.surface_normal))}) m")
 
 class SolarPanelRectangle(SolarPanel):
-    def __init__(self, length=5, width=5, height=0.5, surface_vector = np.array([0, 0, 1]), efficiency = 1):
+    def __init__(self, length=5, width=5, height=0.25, surface_vector = np.array([0, 0, 1]), efficiency = 1):
         """Creates a rectangle shaped solar panel object."""
         if length == width:
             name = "Square"
@@ -27,7 +27,7 @@ class SolarPanelRectangle(SolarPanel):
         self.height = height
 
 class SolarPanelCircle(SolarPanel):
-    def __init__(self, radius=5, height=0.5,surface_vector = np.array([0, 0, 1]), efficiency = 1):
+    def __init__(self, radius=5, height=0.25,surface_vector = np.array([0, 0, 1]), efficiency = 1):
         """Creates a circle shaped solar panel object."""
         name = "Circle"
         area = np.pi * (radius ** 2)
